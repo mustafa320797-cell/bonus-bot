@@ -1,4 +1,4 @@
-import asyncio, configparser, os, re
+import asyncio, os, re
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError
 from urllib.parse import urlparse
@@ -6,26 +6,14 @@ import aiohttp
 import requests
 import datetime
 
-# Konfigürasyon
-config = configparser.ConfigParser()
-config.read('config.ini')
-api_id = int(config['Telegram']['api_id'])
-api_hash = config['Telegram']['api_hash']
-
-source_chats = [
-    '@BonusSoftResmi',
-    '@BAMCOOKOD',
-    '@bonusuzmanikod',
-    '@bonusmadeni',
-    '@KODTIMEDUYURU',
-    '@kodvegas',
-    '@bonusbing',
-    '@promokodcutayfaa'
-]
-target_chat = '@jokerbonuskod'
+# Ortam değişkenlerini oku
+api_id = int(os.getenv("TELEGRAM_API_ID"))
+api_hash = os.getenv("TELEGRAM_API_HASH")
+source_chats = os.getenv("SOURCE_CHATS").split(",")
+target_chat = os.getenv("TARGET_CHAT")
 
 # Kara liste & dosyalar
-blacklist = set(word.strip().lower() for word in config['Filter']['blacklist'].split(','))
+blacklist = set(word.strip().lower() for word in os.getenv("BLACKLIST", "").split(','))
 sent_codes_file = 'sent_codes.txt'
 sent_msg_file = 'sent_message_ids.txt'
 
@@ -198,7 +186,6 @@ async def process_message(event):
         except Exception as err:
             print(f"[YENİDEN HATA] {err}")
 
-# ✅ Worker sayısı artırıldı (10)
 async def main():
     load_persistent_data()
     await client.start()
