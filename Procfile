@@ -1,0 +1,1 @@
+worker: python bonus_bot_queue.py
